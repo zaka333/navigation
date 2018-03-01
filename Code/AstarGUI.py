@@ -1,7 +1,9 @@
 # Aquest fitxer conte les rutines necessaries per a executar el programa de PUBLICTRANS
 # usant una interficie grafica.
 #
-__authors__= """ TO_BE_FILLED """
+__authors__= """ Zakaria El Haddad Zaidi <zakaria.elhaddad@e-campus.uab.cat>
+                 Daniel Amaya Segura 
+             """
 __group__='DL01'
 # _________________________________________________________________________________________
 # Intel.ligencia Artificial
