@@ -1,0 +1,7 @@
+ Vel. line 1 : 10
+ Vel. line 2 : 14
+ Vel. line 3 : 45
+ Vel. line 4 : 3
+
+ MIN  Vel. line : 3
+ MAX  Vel. line : 45
