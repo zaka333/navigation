@@ -10,7 +10,7 @@ __group__='DL01'
 # _______________________________________________________________________________________
 
 from SubwayMap import *
-
+import math
 
 
 class Node:
@@ -51,7 +51,7 @@ class Node:
         """
 
 
-    def setHeuristic(self, typePreference, node_destination,city):
+    def setHeuristic(self, typePreference, node_destination, city):
         """"
         setHeuristic: 	Calculates the heuristic depending on the preference selected
         :params
@@ -65,7 +65,39 @@ class Node:
                 - city: CITYINFO with the information of the city (see CityInfo class definition)
         """
 
+        def calculateMinimumTime():
+            """
+            """
+            # TODO: Implementation
+            pass
 
+        def calculateMinimumDistance():
+            """
+            """
+            #Eucledian distance formula between two vectors
+            self.h = math.sqrt((self.station.x - node_destination.station.x)**2 +
+                               (self.station.y - node_destination.station.y)**2)
+
+        def calculateMinimumTransfers():
+            """
+            """
+            # TODO: Implementation
+            pass
+
+        def calculateMinimumStops():
+            """
+            """
+            pass
+            # TODO: Implementation
+
+        if typePreference == 1:
+            calculateMinimumTime()
+        elif typePreference == 2:
+            calculateMinimumDistance()
+        elif typePreference == 3:
+            calculateMinimumTransfers()
+        elif typePreference == 4:
+            calculateMinimumStops()
 
 
     def setRealCost(self,  costTable):
