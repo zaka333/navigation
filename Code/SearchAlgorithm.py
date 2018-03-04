@@ -52,7 +52,7 @@ class Node:
 
 
     def setHeuristic(self, typePreference, node_destination, city):
-        """"
+        """
         setHeuristic: 	Calculates the heuristic depending on the preference selected
         :params
                 - typePreference: INTEGER Value to indicate the preference selected: 
@@ -68,13 +68,18 @@ class Node:
         def calculateMinimumTime():
             """
             """
-            # TODO: Implementation
-            pass
+            # distance is required
+            calculateMinimumDistance()
+            # avg_lines_velocity  = (origin line velocity + destination line velocity) / 2.0
+            avg_lines_velocity = (city.velocity_lines[self.station.line - 1] +
+                                  city.velocity_lines[node_destination.station.line - 1]) / 2.0
+            # time = distance / velocity
+            self.h = self.h / avg_lines_velocity
 
         def calculateMinimumDistance():
             """
             """
-            #Eucledian distance formula between two vectors
+            # Eucledian distance between two vectors
             self.h = math.sqrt((self.station.x - node_destination.station.x)**2 +
                                (self.station.y - node_destination.station.y)**2)
 
@@ -87,8 +92,8 @@ class Node:
         def calculateMinimumStops():
             """
             """
-            pass
             # TODO: Implementation
+            pass
 
         if typePreference == 1:
             calculateMinimumTime()
