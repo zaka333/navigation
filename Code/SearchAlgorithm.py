@@ -10,7 +10,7 @@ __group__='DL01'
 # _______________________________________________________________________________________
 
 from SubwayMap import *
-
+import math
 
 
 class Node:
@@ -51,8 +51,8 @@ class Node:
         """
 
 
-    def setHeuristic(self, typePreference, node_destination,city):
-        """"
+    def setHeuristic(self, typePreference, node_destination, city):
+        """
         setHeuristic: 	Calculates the heuristic depending on the preference selected
         :params
                 - typePreference: INTEGER Value to indicate the preference selected: 
@@ -65,7 +65,44 @@ class Node:
                 - city: CITYINFO with the information of the city (see CityInfo class definition)
         """
 
+        def calculateMinimumTime():
+            """
+            """
+            # distance is required
+            calculateMinimumDistance()
+            # avg_lines_velocity  = (origin line velocity + destination line velocity) / 2.0
+            avg_lines_velocity = (city.velocity_lines[self.station.line - 1] +
+                                  city.velocity_lines[node_destination.station.line - 1]) / 2.0
+            # time = distance / velocity
+            self.h = self.h / avg_lines_velocity
 
+        def calculateMinimumDistance():
+            """
+            """
+            # Eucledian distance between two vectors
+            self.h = math.sqrt((self.station.x - node_destination.station.x)**2 +
+                               (self.station.y - node_destination.station.y)**2)
+
+        def calculateMinimumTransfers():
+            """
+            """
+            # TODO: Implementation
+            pass
+
+        def calculateMinimumStops():
+            """
+            """
+            # TODO: Implementation
+            pass
+
+        if typePreference == 1:
+            calculateMinimumTime()
+        elif typePreference == 2:
+            calculateMinimumDistance()
+        elif typePreference == 3:
+            calculateMinimumTransfers()
+        elif typePreference == 4:
+            calculateMinimumStops()
 
 
     def setRealCost(self,  costTable):

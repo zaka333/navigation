@@ -40,27 +40,26 @@ class CityInfo:
 	
 
 #search_multiple_lines: Searches the set of stations that have different lines.
-
 def search_multiple_lines(stationList):
-  
+
 
     multipleLines = {}
     for i in stationList:
         for j in stationList:
             if i.id != j.id:
-                if i.x == j.x & i.y == j.x:
+                if i.x == j.x and i.y == j.y:
                     if multipleLines.has_key(i.id):
                         if j.line not in multipleLines[i.id]:
                             multipleLines[i.id].append(j.line)
-                        else:
-                            multipleLines[i.id] = []
-                            multipleLines[i.id].append(j.line)
-                        if multipleLines.has_key(j.id):
-                            if i.line not in multipleLines[j.id]:
-                                multipleLines[j.id].append(i.line)
-                            else:
-                                multipleLines[j.id] = []
-                                multipleLines[j.id].append(i.line)
+                    else:
+                        multipleLines[i.id] = []
+                        multipleLines[i.id].append(j.line)
+                    if multipleLines.has_key(j.id):
+                        if i.line not in multipleLines[j.id]:
+                            multipleLines[j.id].append(i.line)
+                    else:
+                        multipleLines[j.id] = []
+                        multipleLines[j.id].append(i.line)
                     
     return multipleLines
 
@@ -125,7 +124,8 @@ def readCostTable(filename):
     return connections
 
 
-# setNextStations: Given a stationList (- id, name, line, x, y - information), and the set of possible connections between stations,
+# setNextStations: Given a stationList (- id, name, line, x, y - information),
+# and the set of possible connections between stations,
 # This function set the dictionary of the possible destinations for each station (including the cost )
 def setNextStations(stationList, connections):
     for i in stationList:
