@@ -23,31 +23,32 @@ class Node:
                 - father: NODE (see Node definition) of his father
         """
 
-        self.station = station  # STATION information of the Station of this Node
-        self.g = 0  # REAL cost - depending on the type of preference -
-        # to get from the origin to this Node
-        self.h = 0  # REAL heuristic value to get from the origin to this Node
-        self.f = 0  # REAL evaluate function
+        self.station = station      # STATION information of the Station of this Node
+        self.g = 0                  # REAL cost - depending on the type of preference -
+                                    # to get from the origin to this Node
+        self.h = 0                  # REAL heuristic value to get from the origin to this Node
+        self.f = 0                  # REAL evaluate function
         if father == None:
             self.parentsID = []
         else:
             self.parentsID = [father.station.id]
             self.parentsID.extend(father.parentsID)  # TUPLE OF NODES (from the origin to its father)
-        self.father = father  # NODE pointer to his father
-        self.time = 0  # REAL time required to get from the origin to this Node
-        # [optional] Only useful for GUI
-        self.num_stopStation = 0  # INTEGER number of stops stations made from the origin to this Node
-        # [optional] Only useful for GUI
-        self.walk = 0  # REAL distance made from the origin to this Node
-        # [optional] Only useful for GUI
-        self.transfers = 0  # INTEGER number of transfers made from the origin to this Node
-        # [optional] Only useful for GUI
+        self.father = father        # NODE pointer to his father
+        self.time = 0               # REAL time required to get from the origin to this Node
+                                    # [optional] Only useful for GUI
+        self.num_stopStation = 0    # INTEGER number of stops stations made from the origin to this Node
+                                    # [optional] Only useful for GUI
+        self.walk = 0               # REAL distance made from the origin to this Node
+                                    # [optional] Only useful for GUI
+        self.transfers = 0          # INTEGER number of transfers made from the origin to this Node
+                                    # [optional] Only useful for GUI
 
     def setEvaluation(self):
         """
         setEvaluation: 	Calculates the Evaluation Function. Actualizes .f value
        
         """
+
         self.f = self.g + self.h
 
     def setHeuristic(self, typePreference, node_destination, city):
@@ -63,6 +64,7 @@ class Node:
                 - node_destination: PATH of the destination station
                 - city: CITYINFO with the information of the city (see CityInfo class definition)
         """
+
         def calculateMinimumTime():
             # distance is required
             calculateMinimumDistance()
@@ -100,6 +102,7 @@ class Node:
                  - costTable: DICTIONARY. Relates each station with their adjacency an their real cost. NOTE that this
                              cost can be in terms of any preference.
         """
+
         if self.father:
             self.g = self.father.g + costTable[self.father.station.id][self.station.id]
 
@@ -182,6 +185,7 @@ def setCostTable(typePreference, stationList, city):
             - costTable: DICTIONARY. Relates each station with their adjacency an their g, depending on the
                                  type of Preference Selected.
     """
+
     costTable = {}
 
     if typePreference == 1:
