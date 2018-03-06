@@ -196,10 +196,10 @@ def setCostTable(typePreference, stationList, city):
         res = {}
         for station in stationList:
             id = station.id
-            costTable[id] = {}
+            res[id] = {}
             for dest in station.destinationDic:
                 time = station.destinationDic[dest]
-                costTable[id][dest] = time
+                res[id][dest] = time
 
     elif typePreference == 2:
         vel_lines = city.velocity_lines
