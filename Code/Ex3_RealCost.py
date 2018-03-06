@@ -55,14 +55,12 @@ def main():
     print "\n"
     timeCostTable=setCostTable( 1, stationList,city)
     print_connections(timeCostTable)
-
     destination.setRealCost(  timeCostTable)
     print " REAL COST (TIME) from " + origin.station.name + " L" + str(origin.station.line) + " to " + destination.station.name + " L" + str(destination.station.line) + "  : \t\t" +  str(destination.g)
     destination2.setRealCost(timeCostTable)
     print " REAL COST (TIME) from " + destination2.father.station.name + " L" + str(destination2.father.station.line) + " to " + destination2.station.name + " L" + str(destination2.station.line) + "  : \t\t" +  str(destination2.g)
     destination3.setRealCost(timeCostTable)
     print " REAL COST (TIME) from " + origin.station.name + " L" + str(origin.station.line) + " to " + destination3.station.name + " L" + str(destination3.station.line) + "  : \t\t" +  str(destination3.g)
-
     print "\n"
 
     #HEURISTIC 2 : DISTANCE

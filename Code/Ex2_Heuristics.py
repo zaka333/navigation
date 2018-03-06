@@ -65,8 +65,5 @@ def main():
     origin.setHeuristic( 4, destination,city)
     print " HEURISTIC (#STATIONS) from " + origin.station.name + " L" + str(origin.station.line) + " to " + destination.station.name + " L" + str(destination.station.line) + "  : \t\t" +   str(origin.h)
 
-
-
-
 if __name__ == '__main__':
     main()
