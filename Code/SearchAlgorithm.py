@@ -198,7 +198,11 @@ def setCostTable(typePreference, stationList, city):
             costTable[station.id] = {}
             vel = city.velocity_lines[station.line-1]
             for destination, time in station.destinationDic.items():
-                costTable[station.id][destination] = time*vel  # distance = time*velocity
+                if station.x == stationList[destination-1].x and \
+                   station.y == stationList[destination-1].y:
+                    costTable[station.id][destination] = 0
+                else:
+                    costTable[station.id][destination] = time*vel  # distance = time*velocity
 
     elif typePreference == 3:
         for station in stationList:
