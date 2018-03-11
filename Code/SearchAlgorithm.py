@@ -2,7 +2,7 @@
 #
 __authors__ = """   
                     Zakaria El Haddad - 1462424
-                    Alejandro Aznar - 1393102'
+                    Alejandro Aznar - 1393102
                     Daniel Amaya - 1456942
                     Adrià Amorós - 1460597
               """
