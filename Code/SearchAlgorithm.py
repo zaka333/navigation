@@ -65,22 +65,51 @@ class Node:
                 - city: CITYINFO with the information of the city (see CityInfo class definition)
         """
 
-        if typePreference in [1, 2]:
+        if typePreference == 1:
+            distance = euclideanDistance(x1=self.station.x,
+                                         x2=node_destination.station.x,
+                                         y1=self.station.y,
+                                         y2=node_destination.station.y)
+
+            # avg_lines_velocity = (origin line velocity + destination line velocity) / 2.0
+            avg_lines_velocity = (city.velocity_lines[self.station.line - 1] +
+                                  city.velocity_lines[node_destination.station.line - 1]) / 2.0
+
+            self.h = distance / avg_lines_velocity  # time = distance / velocity
+
+        if typePreference == 2:
             self.h = euclideanDistance(x1=self.station.x,
                                        x2=node_destination.station.x,
                                        y1=self.station.y,
                                        y2=node_destination.station.y)
-            if typePreference == 2:
-                # avg_lines_velocity = (origin line velocity + destination line velocity) / 2.0
-                avg_lines_velocity = (city.velocity_lines[self.station.line-1] +
-                                      city.velocity_lines[node_destination.station.line-1]) / 2.0
-                # time = distance / velocity
-                self.h = self.h / avg_lines_velocity
 
         elif typePreference == 3:
-            pass
+            if self.station.line != node_destination.station.line:
+                self.h = 1
+            else:
+                self.h = 0
+
         elif typePreference == 4:
-            pass
+            # Same station, no stops
+            if node_destination.station.name == self.station.name:
+                self.h = 0
+            # adjacent station, 1 stop
+            elif node_destination.station.id in self.station.destinationDic.keys():
+                self.h = 1
+            # no "adjacent", same line, 2 stops (2 stations away at least, 2 stops at least) !!WRONG!! EDIT ME
+            elif node_destination.station.line == self.station.line:
+                self.h = 2
+            # no adjacent, different line, 1 stop (stations id are for combination of ID+Line, so it can be "adjacent"
+            #  meaning 1 stop if the destination is on a different line (+1 transfer)
+            else:
+                self.h = 1
+
+        elif typePreference == 0:
+            # Null Heuristic
+            self.h = 0
+        else:
+            # Do the default
+            print "Set correct type preference"
 
     def setRealCost(self, costTable):
         """
@@ -95,17 +124,8 @@ class Node:
 
 
 def euclideanDistance(x1, x2, y1, y2):
-    """
-    Returns Eucledian distance between two vectors in the space
-    """
-    return math.sqrt((x1-x2)**2+(y1-y2)**2)
 
-
-def manhattanDistance(x1, x2, y1, y2):
-    """
-        Returns Manhattan distance between two vectors in the space
-    """
-    return abs(x1 - x2) + abs(y1 - y2)
+    return math.sqrt(abs(x1-x2)**2+abs(y1-y2)**2)
 
 
 def Expand(fatherNode, stationList, typePreference, node_destination, costTable, city):
@@ -129,6 +149,19 @@ def Expand(fatherNode, stationList, typePreference, node_destination, costTable,
 
     """
 
+    childrenList = []
+    for destination in city.adjacency[fatherNode.station.id].keys():
+        child = Node(stationList[destination - 1], fatherNode)
+        childrenList.append(child)
+
+        # TODO: Add extra part
+
+        child.setHeuristic(typePreference, node_destination, city)
+        child.setRealCost(costTable)
+        child.setEvaluation()
+
+    return childrenList
+
 
 def RemoveCycles(childrenList):
     """
@@ -139,6 +172,40 @@ def RemoveCycles(childrenList):
                 - listWithoutCycles:  LIST of the set of child Nodes for a certain Node which not includes cycles
     """
 
+    # Work In Progress EDIT ME
+    listWithoutCycles = []
+    print "==LIST=="
+    for child in childrenList:
+
+        childPath = []
+        if child.father is not None:
+            current = child.father
+            cycle = False
+            if child.station.id != current.station.id:
+                childPath.append(child.station.id)
+            print "LIST"
+            print child.station.id
+            while (current.father is not None) and (cycle is False):
+                if current.station.id != current.father.station.id:
+                    childPath.append(current.station.id)
+                print (current.station.id)
+                current = current.father
+                cycle = FindDuplicates(childPath)
+
+            if cycle is False:
+                listWithoutCycles.append(child)
+        else:
+            listWithoutCycles.append(child)
+
+    return listWithoutCycles
+
+def FindDuplicates(in_list):
+    unique = set(in_list)
+    for each in unique:
+        count = in_list.count(each)
+        if count > 1:
+            return True
+    return False
 
 def RemoveRedundantPaths(childrenList, nodeList, partialCostTable):
     """
@@ -170,6 +237,12 @@ def sorted_insertion(nodeList, childrenList):
             - nodeList: sorted LIST of NODES to be visited updated with the childrenList included
 	"""
 
+def getPosibleDestinations(stationList):
+    """
+    
+    :param stationList: LIST of the stations of a city. (- id, destinationDic, name, line, x, y -)
+    :return: 
+    """
 
 def setCostTable(typePreference, stationList, city):
     """
@@ -196,7 +269,7 @@ def setCostTable(typePreference, stationList, city):
     elif typePreference == 2:
         for station in stationList:
             costTable[station.id] = {}
-            vel = city.velocity_lines[station.line-1]
+            vel = city.velocity_lines[station.line - 1]
             for destination, time in station.destinationDic.items():
                 if station.x == stationList[destination-1].x and \
                    station.y == stationList[destination-1].y:
@@ -238,6 +311,30 @@ def coord2station(coord, stationList):
             - possible_origins: List of the Indexes of the stationList structure, which corresponds to the closest
             station
     """
+
+    possible_origins = []
+
+    x = coord[0]
+    y = coord[1]
+
+    minDistance = -1
+
+    for index, station in enumerate(stationList):
+        sx = station.x
+        sy = station.y
+        dx = abs(sx - x)
+        dy = abs(sy - y)
+        # Euclidean distance
+        distance = ((dx * dx + dy * dy) ** 0.5)
+
+        if distance == minDistance:
+            possible_origins.append(index)
+
+        elif distance < minDistance or minDistance == -1:
+            minDistance = distance
+            possible_origins = [index]
+
+    return possible_origins
 
 
 def AstarAlgorithm(stationList, coord_origin, coord_destination, typePreference, city, flag_redundants):
