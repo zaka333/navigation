@@ -68,6 +68,7 @@ class Node:
         VALID_TYPE_PREFERENCE = [0, 1, 2, 3, 4]
 
         if typePreference in VALID_TYPE_PREFERENCE:
+
             if typePreference == 1:
                 distance = euclideanDistance(x1=self.station.x,
                                              x2=node_destination.station.x,
@@ -114,6 +115,7 @@ class Node:
             elif typePreference == 0:
                 # Null Heuristic
                 self.h = 0
+
         else:
             # Do the default
             print "Type preference should be in [%s]" %(','.join(["'%s'" % x for x in VALID_TYPE_PREFERENCE]))
