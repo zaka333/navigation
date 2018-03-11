@@ -65,51 +65,60 @@ class Node:
                 - city: CITYINFO with the information of the city (see CityInfo class definition)
         """
 
-        if typePreference == 1:
-            distance = euclideanDistance(x1=self.station.x,
-                                         x2=node_destination.station.x,
-                                         y1=self.station.y,
-                                         y2=node_destination.station.y)
+        VALID_TYPE_PREFERENCE = [0, 1, 2, 3, 4]
 
-            # avg_lines_velocity = (origin line velocity + destination line velocity) / 2.0
-            avg_lines_velocity = (city.velocity_lines[self.station.line - 1] +
-                                  city.velocity_lines[node_destination.station.line - 1]) / 2.0
+        if typePreference in VALID_TYPE_PREFERENCE:
 
-            self.h = distance / avg_lines_velocity  # time = distance / velocity
+            if typePreference == 1:
+                distance = euclideanDistance(x1=self.station.x,
+                                             x2=node_destination.station.x,
+                                             y1=self.station.y,
+                                             y2=node_destination.station.y)
 
-        if typePreference == 2:
-            self.h = euclideanDistance(x1=self.station.x,
-                                       x2=node_destination.station.x,
-                                       y1=self.station.y,
-                                       y2=node_destination.station.y)
+                if node_destination.station.name == self.station.name:
+                    time = 0
+                else:
+                    time = distance / city.max_velocity
 
-        elif typePreference == 3:
-            if self.station.line != node_destination.station.line:
-                self.h = 1
-            else:
+                if node_destination.station.name != self.station.name and node_destination.station.line != self.station.line:
+                    self.h = time + city.min_transfer
+                else:
+                    self.h = time
+
+            if typePreference == 2:
+                self.h = euclideanDistance(x1=self.station.x,
+                                           x2=node_destination.station.x,
+                                           y1=self.station.y,
+                                           y2=node_destination.station.y)
+
+            elif typePreference == 3:
+                if self.station.line != node_destination.station.line:
+                    self.h = 1
+                else:
+                    self.h = 0
+
+            elif typePreference == 4:
+                # Same station, no stops
+                if node_destination.station.name == self.station.name:
+                    self.h = 0
+                # adjacent station, 1 stop
+                elif node_destination.station.id in self.station.destinationDic.keys():
+                    self.h = 1
+                # no "adjacent", same line, 2 stops (2 stations away at least, 2 stops at least) !!WRONG!! EDIT ME
+                #elif node_destination.station.line == self.station.line:
+                    #self.h = 2
+                # no adjacent, different line, 1 stop (stations id are for combination of ID+Line, so it can be "adjacent"
+                #  meaning 1 stop if the destination is on a different line (+1 transfer)
+                else:
+                    self.h = 1
+
+            elif typePreference == 0:
+                # Null Heuristic
                 self.h = 0
 
-        elif typePreference == 4:
-            # Same station, no stops
-            if node_destination.station.name == self.station.name:
-                self.h = 0
-            # adjacent station, 1 stop
-            elif node_destination.station.id in self.station.destinationDic.keys():
-                self.h = 1
-            # no "adjacent", same line, 2 stops (2 stations away at least, 2 stops at least) !!WRONG!! EDIT ME
-            elif node_destination.station.line == self.station.line:
-                self.h = 2
-            # no adjacent, different line, 1 stop (stations id are for combination of ID+Line, so it can be "adjacent"
-            #  meaning 1 stop if the destination is on a different line (+1 transfer)
-            else:
-                self.h = 1
-
-        elif typePreference == 0:
-            # Null Heuristic
-            self.h = 0
         else:
             # Do the default
-            print "Set correct type preference"
+            print "Type preference should be in [%s]" %(','.join(VALID_TYPE_PREFERENCE))
 
     def setRealCost(self, costTable):
         """
