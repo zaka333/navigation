@@ -1,5 +1,7 @@
+# !/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 # This file contains all the required routines to make an A* search algorithm.
-#
 __authors__ = """   
                     Zakaria El Haddad - 1462424
                     Alejandro Aznar - 1393102
