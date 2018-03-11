@@ -1,6 +1,11 @@
 # This file contains all the required routines to make an A* search algorithm.
 #
-__authors__ = 'TO_BE_FILLED'
+__authors__ = """   
+                    Zakaria El Haddad - 1462424
+                    Alejandro Aznar - 1393102
+                    Daniel Amaya - 1456942
+                    Adrià Amorós - 1460597
+              """
 __group__ = 'DL01'
 # _________________________________________________________________________________________
 # Intel.ligencia Artificial
@@ -104,6 +109,7 @@ class Node:
                 # adjacent station, 1 stop
                 elif node_destination.station.id in self.station.destinationDic.keys():
                     self.h = 1
+
                 # no "adjacent", same line, 2 stops (2 stations away at least, 2 stops at least) !!WRONG!! EDIT ME
                 #elif node_destination.station.line == self.station.line:
                     #self.h = 2
