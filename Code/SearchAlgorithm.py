@@ -6,7 +6,7 @@ __authors__ = """
                     Daniel Amaya - 1456942
                     Adrià Amorós - 1460597
               """
-__group__ = 'DL01'
+__group__ = 'DM17'
 # _________________________________________________________________________________________
 # Intel.ligencia Artificial
 # Grau en Enginyeria Informatica
