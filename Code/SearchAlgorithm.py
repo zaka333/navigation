@@ -118,7 +118,7 @@ class Node:
 
         else:
             # Do the default
-            print "Type preference should be in [%s]" %(','.join(["'%s'" % x for x in VALID_TYPE_PREFERENCE]))
+            print "Type preference should be in [%s]" %(','.join(VALID_TYPE_PREFERENCE))
 
     def setRealCost(self, costTable):
         """
