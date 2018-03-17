@@ -87,7 +87,8 @@ class Node:
                 else:
                     time = distance / city.max_velocity
 
-                if node_destination.station.name != self.station.name and node_destination.station.line != self.station.line:
+                if node_destination.station.name != self.station.name and\
+                   node_destination.station.line != self.station.line:
                     self.h = time + city.min_transfer
                 else:
                     self.h = time
@@ -189,40 +190,36 @@ def RemoveCycles(childrenList):
                 - listWithoutCycles:  LIST of the set of child Nodes for a certain Node which not includes cycles
     """
 
-    # Work In Progress EDIT ME
     listWithoutCycles = []
-    print "==LIST=="
-    for child in childrenList:
 
-        childPath = []
-        if child.father is not None:
-            current = child.father
-            cycle = False
-            if child.station.id != current.station.id:
-                childPath.append(child.station.id)
-            print "LIST"
-            print child.station.id
-            while (current.father is not None) and (cycle is False):
-                if current.station.id != current.father.station.id:
-                    childPath.append(current.station.id)
-                print (current.station.id)
-                current = current.father
-                cycle = FindDuplicates(childPath)
+    if childrenList:
+        for child in childrenList:
+            if child.parentsID:
+                print "Parent : %s" % child.station.id
+                cycle = False
+                children_ids = [child.station.id]
+                current = child.father
+                print "Children:"
+                while (current is not None) and (cycle is False):
+                    print "%s" % current.station.id
+                    if current.station.id not in children_ids:
+                        children_ids.append(current.station.id)
+                        current = current.father
+                    else:
+                        cycle = True
 
-            if cycle is False:
-                listWithoutCycles.append(child)
-        else:
-            listWithoutCycles.append(child)
+                if cycle is False:
+                    listWithoutCycles.append(child)
+                print "Cycle: %s" % cycle
+                print ""
+
+            else:
+                print "Hey, there's a child without parents!"
+    else:
+        print "Ups, no children to check!"
 
     return listWithoutCycles
 
-def FindDuplicates(in_list):
-    unique = set(in_list)
-    for each in unique:
-        count = in_list.count(each)
-        if count > 1:
-            return True
-    return False
 
 def RemoveRedundantPaths(childrenList, nodeList, partialCostTable):
     """
@@ -241,6 +238,24 @@ def RemoveRedundantPaths(childrenList, nodeList, partialCostTable):
                 - partialCostTable: DICTIONARY of the minimum g to get each key (Node) from the origin Node (updated)
     """
 
+    for i, child in enumerate(childrenList):
+        if child.station.id in partialCostTable.keys():
+            if child.g < partialCostTable[child.station.id]:
+                # update partial cost table
+                partialCostTable[child.station.id] = child.g
+                # remove redundant paths
+                for n, node in enumerate(nodeList):
+                    if node.station.id in child.station.destinationDic.keys():
+                        del nodeList[n]
+            elif child.g > partialCostTable[child.station.id]:
+                # remove current child
+                del childrenList[i]
+        else:
+            # add new entry
+            partialCostTable[child.station.id] = child.g
+
+    return childrenList, nodeList, partialCostTable
+
 
 def sorted_insertion(nodeList, childrenList):
     """ Sorted_insertion:   It inserts each of the elements of childrenList into the nodeList.
@@ -253,6 +268,8 @@ def sorted_insertion(nodeList, childrenList):
 		:returns
             - nodeList: sorted LIST of NODES to be visited updated with the childrenList included
 	"""
+
+
 
 def getPosibleDestinations(stationList):
     """
