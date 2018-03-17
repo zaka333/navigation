@@ -195,13 +195,10 @@ def RemoveCycles(childrenList):
     if childrenList:
         for child in childrenList:
             if child.parentsID:
-                print "Parent : %s" % child.station.id
                 cycle = False
                 children_ids = [child.station.id]
                 current = child.father
-                print "Children:"
                 while (current is not None) and (cycle is False):
-                    print "%s" % current.station.id
                     if current.station.id not in children_ids:
                         children_ids.append(current.station.id)
                         current = current.father
@@ -210,8 +207,6 @@ def RemoveCycles(childrenList):
 
                 if cycle is False:
                     listWithoutCycles.append(child)
-                print "Cycle: %s" % cycle
-                print ""
 
             else:
                 print "Hey, there's a child without parents!"
