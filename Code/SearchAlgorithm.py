@@ -35,7 +35,7 @@ class Node:
                                     # to get from the origin to this Node
         self.h = 0                  # REAL heuristic value to get from the origin to this Node
         self.f = 0                  # REAL evaluate function
-        if father == None:
+        if father is None:
             self.parentsID = []
         else:
             self.parentsID = [father.station.id]
@@ -87,7 +87,8 @@ class Node:
                 else:
                     time = distance / city.max_velocity
 
-                if node_destination.station.name != self.station.name and node_destination.station.line != self.station.line:
+                if node_destination.station.name != self.station.name and\
+                   node_destination.station.line != self.station.line:
                     self.h = time + city.min_transfer
                 else:
                     self.h = time
@@ -189,40 +190,20 @@ def RemoveCycles(childrenList):
                 - listWithoutCycles:  LIST of the set of child Nodes for a certain Node which not includes cycles
     """
 
-    # Work In Progress EDIT ME
     listWithoutCycles = []
-    print "==LIST=="
-    for child in childrenList:
 
-        childPath = []
+    for child in childrenList:
         if child.father is not None:
             current = child.father
-            cycle = False
-            if child.station.id != current.station.id:
-                childPath.append(child.station.id)
-            print "LIST"
-            print child.station.id
-            while (current.father is not None) and (cycle is False):
-                if current.station.id != current.father.station.id:
-                    childPath.append(current.station.id)
-                print (current.station.id)
+            while (current.father is not None) and (current.station.id != child.station.id):
                 current = current.father
-                cycle = FindDuplicates(childPath)
-
-            if cycle is False:
+            if current.station.id is not child.station.id:
                 listWithoutCycles.append(child)
         else:
             listWithoutCycles.append(child)
 
     return listWithoutCycles
 
-def FindDuplicates(in_list):
-    unique = set(in_list)
-    for each in unique:
-        count = in_list.count(each)
-        if count > 1:
-            return True
-    return False
 
 def RemoveRedundantPaths(childrenList, nodeList, partialCostTable):
     """
@@ -241,6 +222,24 @@ def RemoveRedundantPaths(childrenList, nodeList, partialCostTable):
                 - partialCostTable: DICTIONARY of the minimum g to get each key (Node) from the origin Node (updated)
     """
 
+    newChildrenList = []
+
+    for child in childrenList:
+        if child.station.id in partialCostTable.keys():
+            if child.g < partialCostTable[child.station.id]:
+                # update partial cost table
+                partialCostTable[child.station.id] = child.g
+                # remove redundant paths
+                nodeList = [node for node in nodeList if node.station.id != child.station.id]
+                newChildrenList.append(child)
+
+        else:
+            # add new entry
+            partialCostTable[child.station.id] = child.g
+            newChildrenList.append(child)
+
+    return newChildrenList, nodeList, partialCostTable
+
 
 def sorted_insertion(nodeList, childrenList):
     """ Sorted_insertion:   It inserts each of the elements of childrenList into the nodeList.
@@ -253,6 +252,20 @@ def sorted_insertion(nodeList, childrenList):
 		:returns
             - nodeList: sorted LIST of NODES to be visited updated with the childrenList included
 	"""
+
+    for child in childrenList:
+        if nodeList:
+            current = child.f
+            i = 0
+            while i < len(nodeList) and nodeList[i].f < current:
+                i += 1
+
+            nodeList.insert(i, child)
+        else:
+            nodeList = [child]
+
+    return nodeList
+
 
 def getPosibleDestinations(stationList):
     """
