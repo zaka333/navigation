@@ -35,7 +35,7 @@ class Node:
                                     # to get from the origin to this Node
         self.h = 0                  # REAL heuristic value to get from the origin to this Node
         self.f = 0                  # REAL evaluate function
-        if father == None:
+        if father is None:
             self.parentsID = []
         else:
             self.parentsID = [father.station.id]
@@ -192,26 +192,15 @@ def RemoveCycles(childrenList):
 
     listWithoutCycles = []
 
-    if childrenList:
-        for child in childrenList:
-            if child.parentsID:
-                cycle = False
-                children_ids = [child.station.id]
-                current = child.father
-                while (current is not None) and (cycle is False):
-                    if current.station.id not in children_ids:
-                        children_ids.append(current.station.id)
-                        current = current.father
-                    else:
-                        cycle = True
-
-                if cycle is False:
-                    listWithoutCycles.append(child)
-
-            else:
-                print "Hey, there's a child without parents!"
-    else:
-        print "Ups, no children to check!"
+    for child in childrenList:
+        if child.father is not None:
+            current = child.father
+            while (current.father is not None) and (current.station.id != child.station.id):
+                current = current.father
+            if current.station.id is not child.station.id:
+                listWithoutCycles.append(child)
+        else:
+            listWithoutCycles.append(child)
 
     return listWithoutCycles
 
@@ -233,23 +222,23 @@ def RemoveRedundantPaths(childrenList, nodeList, partialCostTable):
                 - partialCostTable: DICTIONARY of the minimum g to get each key (Node) from the origin Node (updated)
     """
 
-    for i, child in enumerate(childrenList):
+    newChildrenList = []
+
+    for child in childrenList:
         if child.station.id in partialCostTable.keys():
             if child.g < partialCostTable[child.station.id]:
                 # update partial cost table
                 partialCostTable[child.station.id] = child.g
                 # remove redundant paths
-                for n, node in enumerate(nodeList):
-                    if node.station.id in child.station.destinationDic.keys():
-                        del nodeList[n]
-            elif child.g > partialCostTable[child.station.id]:
-                # remove current child
-                del childrenList[i]
+                nodeList = [node for node in nodeList if node.station.id != child.station.id]
+                newChildrenList.append(child)
+
         else:
             # add new entry
             partialCostTable[child.station.id] = child.g
+            newChildrenList.append(child)
 
-    return childrenList, nodeList, partialCostTable
+    return newChildrenList, nodeList, partialCostTable
 
 
 def sorted_insertion(nodeList, childrenList):
@@ -264,6 +253,18 @@ def sorted_insertion(nodeList, childrenList):
             - nodeList: sorted LIST of NODES to be visited updated with the childrenList included
 	"""
 
+    for child in childrenList:
+        if nodeList:
+            current = child.f
+            i = 0
+            while i < len(nodeList) and nodeList[i].f < current:
+                i += 1
+
+            nodeList.insert(i, child)
+        else:
+            nodeList = [child]
+
+    return nodeList
 
 
 def getPosibleDestinations(stationList):
