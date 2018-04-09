@@ -1,8 +1,7 @@
 # Aquest fitxer conte les rutines necessaries per a executar el programa de PUBLICTRANS
 # usant una interficie grafica.
 #
-__authors__= """ 
-             """
+__authors__='TO_BE_FILLED'
 __group__='DL01'
 # _________________________________________________________________________________________
 # Intel.ligencia Artificial
@@ -15,9 +14,6 @@ __group__='DL01'
 # REQUIRED LIBRARIES
 from Tkinter import *
 import ScrolledText
-import sys
-import math
-import tkMessageBox
 import os
 from SubwayMap import *
 from SearchAlgorithm import *
@@ -397,8 +393,8 @@ class _Astargui:
         else:
             self.Update_Resultant_Path([], [], [], [], [], [], " NO HAS SELECCIONAT CAP ORIGEN", [], [], [], [], [])
 
-        #Button_Update_Position : Button "Establir Coordenades" calls this function.
-        #                     It Update Coordinates values from the boxes
+        # Button_Update_Position : Button "Establir Coordenades" calls this function.
+        # It Update Coordinates values from the boxes
 
     def Button_Update_Position(self, event):
         self.string_destination_position_x.set(self.string_destination_position_x.get())
