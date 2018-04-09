@@ -124,8 +124,7 @@ def readCostTable(filename):
     return connections
 
 
-# setNextStations: Given a stationList (- id, name, line, x, y - information),
-# and the set of possible connections between stations,
+# setNextStations: Given a stationList (- id, name, line, x, y - information), and the set of possible connections between stations,
 # This function set the dictionary of the possible destinations for each station (including the cost )
 def setNextStations(stationList, connections):
     for i in stationList:

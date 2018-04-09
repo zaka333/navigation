@@ -30,25 +30,25 @@ class Node:
                 - father: NODE (see Node definition) of his father
         """
 
-        self.station = station      # STATION information of the Station of this Node
-        self.g = 0                  # REAL cost - depending on the type of preference -
-                                    # to get from the origin to this Node
-        self.h = 0                  # REAL heuristic value to get from the origin to this Node
-        self.f = 0                  # REAL evaluate function
+        self.station = station  # STATION information of the Station of this Node
+        self.g = 0  # REAL cost - depending on the type of preference -
+        # to get from the origin to this Node
+        self.h = 0  # REAL heuristic value to get from the origin to this Node
+        self.f = 0  # REAL evaluate function
         if father is None:
             self.parentsID = []
         else:
             self.parentsID = [father.station.id]
             self.parentsID.extend(father.parentsID)  # TUPLE OF NODES (from the origin to its father)
-        self.father = father        # NODE pointer to his father
-        self.time = 0               # REAL time required to get from the origin to this Node
-                                    # [optional] only useful for GUI
-        self.num_stopStation = 0    # INTEGER number of stops stations made from the origin to this Node
-                                    # [optional] Only useful for GUI
-        self.walk = 0               # REAL distance made from the origin to this Node
-                                    # [optional] Only useful for GUI
-        self.transfers = 0          # INTEGER number of transfers made from the origin to this Node
-                                    # [optional] Only useful for GUI
+        self.father = father  # NODE pointer to his father
+        self.time = 0  # REAL time required to get from the origin to this Node
+        # [optional] only useful for GUI
+        self.num_stopStation = 0  # INTEGER number of stops stations made from the origin to this Node
+        # [optional] Only useful for GUI
+        self.walk = 0  # REAL distance made from the origin to this Node
+        # [optional] Only useful for GUI
+        self.transfers = 0  # INTEGER number of transfers made from the origin to this Node
+        # [optional] Only useful for GUI
 
     def setEvaluation(self):
         """
@@ -65,69 +65,61 @@ class Node:
                 - typePreference: INTEGER Value to indicate the preference selected: 
                                 0 - Null Heuristic
                                 1 - minimum Time
-                                2 - minimum Distance 
+                                2 - minimum Distance
                                 3 - minimum Transfers
                                 4 - minimum Stops
                 - node_destination: PATH of the destination station
                 - city: CITYINFO with the information of the city (see CityInfo class definition)
         """
 
-        VALID_TYPE_PREFERENCE = [0, 1, 2, 3, 4]
+        if typePreference == 1:
+            distance = euclideanDistance(x1=self.station.x,
+                                         x2=node_destination.station.x,
+                                         y1=self.station.y,
+                                         y2=node_destination.station.y)
 
-        if typePreference in VALID_TYPE_PREFERENCE:
+            if node_destination.station.name == self.station.name:
+                time = 0
+            else:
+                time = distance / city.max_velocity
 
-            if typePreference == 1:
-                distance = euclideanDistance(x1=self.station.x,
-                                             x2=node_destination.station.x,
-                                             y1=self.station.y,
-                                             y2=node_destination.station.y)
+            if node_destination.station.name != self.station.name and \
+                    node_destination.station.line != self.station.line:
+                self.h = time + city.min_transfer
+            else:
+                self.h = time
 
-                if node_destination.station.name == self.station.name:
-                    time = 0
-                else:
-                    time = distance / city.max_velocity
+        if typePreference == 2:
+            self.h = euclideanDistance(x1=self.station.x,
+                                       x2=node_destination.station.x,
+                                       y1=self.station.y,
+                                       y2=node_destination.station.y)
 
-                if node_destination.station.name != self.station.name and\
-                   node_destination.station.line != self.station.line:
-                    self.h = time + city.min_transfer
-                else:
-                    self.h = time
-
-            if typePreference == 2:
-                self.h = euclideanDistance(x1=self.station.x,
-                                           x2=node_destination.station.x,
-                                           y1=self.station.y,
-                                           y2=node_destination.station.y)
-
-            elif typePreference == 3:
-                if self.station.line != node_destination.station.line:
-                    self.h = 1
-                else:
-                    self.h = 0
-
-            elif typePreference == 4:
-                # Same station, no stops
-                if node_destination.station.name == self.station.name:
-                    self.h = 0
-                # adjacent station, 1 stop
-                elif node_destination.station.id in self.station.destinationDic.keys():
-                    self.h = 1
-
-                # no "adjacent", same line, 2 stops (2 stations away at least, 2 stops at least) !!WRONG!! EDIT ME
-                #elif node_destination.station.line == self.station.line:
-                    #self.h = 2
-                # no adjacent, different line, 1 stop (stations id are for combination of ID+Line, so it can be "adjacent"
-                #  meaning 1 stop if the destination is on a different line (+1 transfer)
-                else:
-                    self.h = 1
-
-            elif typePreference == 0:
-                # Null Heuristic
+        elif typePreference == 3:
+            if self.station.line != node_destination.station.line:
+                self.h = 1
+            else:
                 self.h = 0
+
+        elif typePreference == 4:
+            # Same station, no stops
+            if node_destination.station.name == self.station.name:
+                self.h = 0
+            # adjacent station, 1 stop
+            elif node_destination.station.id in self.station.destinationDic.keys():
+                self.h = 1
+            # no adjacent, different line, 1 stop (stations id are for combination of ID+Line),
+            # so it can be "adjacent" meaning 1 stop if the destination is on a different line (+1 transfer)
+            else:
+                self.h = 1
+
+        elif typePreference == 0:
+            # Null Heuristic
+            self.h = 0
 
         else:
             # Do the default
-            print "Type preference should be in [%s]" %(','.join(VALID_TYPE_PREFERENCE))
+            pass
 
     def setRealCost(self, costTable):
         """
@@ -142,8 +134,7 @@ class Node:
 
 
 def euclideanDistance(x1, x2, y1, y2):
-
-    return math.sqrt(abs(x1-x2)**2+abs(y1-y2)**2)
+    return math.sqrt(abs(x1 - x2) ** 2 + abs(y1 - y2) ** 2)
 
 
 def Expand(fatherNode, stationList, typePreference, node_destination, costTable, city):
@@ -171,8 +162,6 @@ def Expand(fatherNode, stationList, typePreference, node_destination, costTable,
     for destination in city.adjacency[fatherNode.station.id].keys():
         child = Node(stationList[destination - 1], fatherNode)
         childrenList.append(child)
-
-        # TODO: Add extra part
 
         child.setHeuristic(typePreference, node_destination, city)
         child.setRealCost(costTable)
@@ -273,6 +262,8 @@ def getPosibleDestinations(stationList):
     :param stationList: LIST of the stations of a city. (- id, destinationDic, name, line, x, y -)
     :return: 
     """
+    pass
+
 
 def setCostTable(typePreference, stationList, city):
     """
@@ -301,18 +292,18 @@ def setCostTable(typePreference, stationList, city):
             costTable[station.id] = {}
             vel = city.velocity_lines[station.line - 1]
             for destination, time in station.destinationDic.items():
-                if station.x == stationList[destination-1].x and \
-                   station.y == stationList[destination-1].y:
+                if station.x == stationList[destination - 1].x and \
+                        station.y == stationList[destination - 1].y:
                     costTable[station.id][destination] = 0
                 else:
-                    costTable[station.id][destination] = time*vel  # distance = time*velocity
+                    costTable[station.id][destination] = time * vel  # distance = time*velocity
 
     elif typePreference == 3:
         for station in stationList:
             costTable[station.id] = {}
             for destination in station.destinationDic.keys():
-                if station.x == stationList[destination-1].x and \
-                   station.y == stationList[destination-1].y:
+                if station.x == stationList[destination - 1].x and \
+                        station.y == stationList[destination - 1].y:
                     costTable[station.id][destination] = 1
                 else:
                     costTable[station.id][destination] = 0
@@ -322,10 +313,13 @@ def setCostTable(typePreference, stationList, city):
             costTable[station.id] = {}
             for destination in station.destinationDic:
                 if station.x == stationList[destination - 1].x and \
-                   station.y == stationList[destination - 1].y:
+                        station.y == stationList[destination - 1].y:
                     costTable[station.id][destination] = 0
                 else:
                     costTable[station.id][destination] = 1
+    else:
+        # Do the default
+        pass
 
     return costTable
 
@@ -403,3 +397,50 @@ def AstarAlgorithm(stationList, coord_origin, coord_destination, typePreference,
             len(expandedList), len(idsOptimalPath), visitedNodes, idsOptimalPath, min_distance_origin,
             min_distance_destination
     """
+
+    visitedNodes = []
+    idsOptimalPath = [coord2station(coord_destination, stationList)[0]]
+    min_distance_origin = 0.0
+    min_distance_destination = 0.0
+
+    # '1' = time, '2' = distance, '3' = transfers, '4' = stops
+    optimalPath = {'1': 0.0, '2': 0.0, '3': 0, '4': 0}
+
+    if coord_origin == coord_destination:
+        pass
+
+    else:
+        costTable = {}
+        costTable = setCostTable(int(typePreference), stationList, city)
+
+        # creates a Node object with the coordinates of the nearest station
+        originNode = Node(stationList[coord2station(coord_origin, stationList)[0]], None)
+        destinationNode = Node(stationList[coord2station(coord_destination, stationList)[0]], None)
+
+        partialCostTable = {}
+        current = []
+        current_children = []
+
+        paths = [originNode]
+        while paths and paths[0].station.id != destinationNode.station.id:
+            current = paths.pop(0)
+            current_children = Expand(current, stationList, int(typePreference), destinationNode, costTable, city)
+            current_children = RemoveCycles(current_children)
+            if flag_redundants:
+                current_children, paths, partialCostTable = RemoveRedundantPaths(current_children, paths, partialCostTable)
+            paths = sorted_insertion(paths, current_children)
+
+            visitedNodes.append(current.station.id)
+
+        if paths:
+            min_distance_origin = paths[0].g
+            min_distance_destination = paths[-1].g
+
+            optimalPath[typePreference] = paths[0].f
+
+            idsOptimalPath = []
+            idsOptimalPath.extend(reversed(paths[0].parentsID))
+            idsOptimalPath.append(destinationNode.station.id)
+
+    return optimalPath['1'], optimalPath['2'], optimalPath['3'], optimalPath['4'], len(visitedNodes), \
+           len(idsOptimalPath) - 1, visitedNodes, idsOptimalPath, min_distance_origin, min_distance_destination
